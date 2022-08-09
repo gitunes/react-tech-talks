@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
+import "./App.css";
 
-function App() {
+import { connect } from "react-redux";
+
+import Navbar from "./components/Navbar/Navbar";
+import Products from "./components/Products/Products";
+import Cart from "./components/Cart/Cart";
+import SingleItem from "./components/SingleItem/SingleItem";
+import Login from "./components/Login/Login";
+import PrivateRoute from "./components/PrivateRoute";
+
+function App({ current }) {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="app">
+        <Navbar />
+        <Switch>
+          <PrivateRoute exact path="/" component={Products} />
+          <PrivateRoute exact path="/cart" component={Cart} />
+          <Route exact path="/login" component={Login} />
+          {!current ? (
+            <Redirect to="/" />
+          ) : (
+            <PrivateRoute exact path="/product/:id" component={SingleItem} />
+          )}
+        </Switch>
+      </div>
+    </BrowserRouter>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    current: state.shop.currentItem,
+  };
+};
+
+export default connect(mapStateToProps)(App);
